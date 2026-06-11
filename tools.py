@@ -69,8 +69,40 @@ def search_listings(
 
     Before writing code, fill in the Tool 1 section of planning.md.
     """
-    # Replace this with your implementation
-    return []
+    listings = load_listings()
+    
+    results = []
+    
+    # Pre-process keywords
+    keywords = set(description.lower().split())
+
+    for item in listings:
+        # Filter by price
+        if max_price is not None and item["price"] > max_price:
+            continue
+            
+        # Filter by size
+        if size is not None and size.lower() != item.get("size", "").lower():
+            continue
+            
+        # Score by keyword overlap (title + description + category + style_tags)
+        item_text = f"{item.get('title', '')} {item.get('description', '')} {item.get('category', '')} {' '.join(item.get('style_tags', []))}".lower()
+        score = sum(1 for kw in keywords if kw in item_text)
+        
+        if score > 0:
+            # Store score temporarily
+            item_with_score = dict(item)
+            item_with_score["_score"] = score
+            results.append(item_with_score)
+
+    # Sort by score descending
+    results.sort(key=lambda x: x["_score"], reverse=True)
+    
+    # Remove the temporary score key
+    for r in results:
+        del r["_score"]
+        
+    return results
 
 
 # ── Tool 2: suggest_outfit ────────────────────────────────────────────────────
@@ -100,8 +132,30 @@ def suggest_outfit(new_item: dict, wardrobe: dict) -> str:
 
     Before writing code, fill in the Tool 2 section of planning.md.
     """
-    # Replace this with your implementation
-    return ""
+    if not wardrobe or not wardrobe.get("items"):
+        prompt = (
+            f"I just bought a '{new_item.get('title')}' ({new_item.get('description')}). "
+            "I don't have any specific wardrobe items saved right now. "
+            "Can you give me some general, versatile styling ideas for this piece? What kinds of items and vibes pair well with it?"
+        )
+    else:
+        wardrobe_list = "\n".join([f"- {w.get('color', '')} {w.get('category', '')} ({w.get('style', '')})" for w in wardrobe["items"]])
+        prompt = (
+            f"I just bought a '{new_item.get('title')}' ({new_item.get('description')}). "
+            f"Here is my current wardrobe:\n{wardrobe_list}\n"
+            "Can you suggest 1-2 complete outfit combinations using my new item and these pieces from my wardrobe?"
+        )
+
+    try:
+        client = _get_groq_client()
+        completion = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7,
+        )
+        return completion.choices[0].message.content.strip()
+    except Exception as e:
+        return f"Could not generate an outfit suggestion: {e}"
 
 
 # ── Tool 3: create_fit_card ───────────────────────────────────────────────────
@@ -133,5 +187,24 @@ def create_fit_card(outfit: str, new_item: dict) -> str:
 
     Before writing code, fill in the Tool 3 section of planning.md.
     """
-    # Replace this with your implementation
-    return ""
+    if not outfit or not outfit.strip():
+        return "Error: Missing outfit suggestion to generate a fit card."
+
+    prompt = (
+        f"I'm putting together an outfit featuring a '{new_item.get('title')}' I got for ${new_item.get('price')} on {new_item.get('platform', 'a thrift site')}. "
+        f"Here is the outfit plan:\n{outfit}\n"
+        "Write a short, shareable Instagram or TikTok caption (2-4 sentences) for this outfit. "
+        "Keep it casual and authentic, mention the item name, price, and platform naturally (once each), "
+        "and capture the outfit's vibe. Do not sound like a product description."
+    )
+
+    try:
+        client = _get_groq_client()
+        completion = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.9,
+        )
+        return completion.choices[0].message.content.strip()
+    except Exception as e:
+        return f"Could not generate fit card: {e}"
