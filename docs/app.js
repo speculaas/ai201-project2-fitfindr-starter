@@ -1,6 +1,3 @@
-import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs';
-
 let slides = [];
 let currentIndex = 0;
 
@@ -13,23 +10,38 @@ const descEl = document.getElementById("gallery-description");
 const currentSlideEl = document.getElementById("current-slide");
 const totalSlidesEl = document.getElementById("total-slides");
 
-// Initialize mermaid with ELK support
-mermaid.registerLayoutLoaders(elkLayouts);
-mermaid.initialize({ startOnLoad: false, theme: 'default' });
+// Use an async IIFE to catch import errors gracefully
+(async function init() {
+    try {
+        titleEl.textContent = "Loading modules...";
+        
+        // Dynamically import Mermaid and ELK to catch any CDN/CORS errors
+        const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
+        const { default: elkLayouts } = await import('https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs');
 
-// Fetch JSON data
-fetch("data.json")
-    .then(response => response.json())
-    .then(data => {
+        // Initialize mermaid with ELK support
+        mermaid.registerLayoutLoaders(elkLayouts);
+        mermaid.initialize({ startOnLoad: false, theme: 'default' });
+        
+        // Expose mermaid to global scope so renderSlide's onerror can use it
+        window.mermaid = mermaid;
+
+        titleEl.textContent = "Fetching data...";
+
+        // Fetch JSON data
+        const response = await fetch("data.json");
+        const data = await response.json();
+        
         slides = data;
         totalSlidesEl.textContent = slides.length;
         renderSlide(currentIndex);
-    })
-    .catch(err => {
-        console.error("Failed to load gallery data:", err);
-        titleEl.textContent = "Error Loading Data";
-        descEl.innerHTML = "<p>Could not load data.json. Ensure you are running this over a local HTTP server.</p>";
-    });
+
+    } catch (err) {
+        console.error("Initialization failed:", err);
+        titleEl.textContent = "Error Starting App";
+        descEl.innerHTML = `<p>There was a problem loading the scripts or data:</p><pre style="color:red;">${err.stack || err.message || err}</pre><p>Check your browser console (F12) for more details.</p>`;
+    }
+})();
 
 function renderSlide(index) {
     if (slides.length === 0) return;
@@ -48,7 +60,7 @@ function renderSlide(index) {
         renderEl.style.display = 'flex';
         
         try {
-            const { svg } = await mermaid.render('mermaid-svg-' + index, slide.mermaid_code);
+            const { svg } = await window.mermaid.render('mermaid-svg-' + index, slide.mermaid_code);
             renderEl.innerHTML = svg;
             
             // Enable SVG Pan and Zoom
@@ -71,7 +83,7 @@ function renderSlide(index) {
             fallbackEl.style.display = "block";
         }
     };
-
+    
     // Trigger load
     imgEl.src = slide.image_filename;
     codeEl.textContent = slide.mermaid_code;
