@@ -16,7 +16,7 @@ const totalSlidesEl = document.getElementById("total-slides");
         titleEl.textContent = "Loading modules...";
         
         // Dynamically import Mermaid and ELK to catch any CDN/CORS errors
-        const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
+        const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
         const { default: elkLayouts } = await import('https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs');
 
         // Initialize mermaid with ELK support
