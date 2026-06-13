@@ -24,7 +24,7 @@ body {
 .media-column {
     flex: 0 0 60%;
     position: relative;
-    background-color: #000;
+    background-color: #fff; /* White background for Mermaid visibility */
     display: flex;
     align-items: center;
     justify-content: center;

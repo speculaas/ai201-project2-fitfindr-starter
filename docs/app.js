@@ -4,11 +4,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const imgEl = document.getElementById("gallery-image");
     const fallbackEl = document.getElementById("mermaid-fallback");
+    const renderEl = document.getElementById("mermaid-render");
     const codeEl = document.getElementById("mermaid-code");
     const titleEl = document.getElementById("gallery-title");
     const descEl = document.getElementById("gallery-description");
     const currentSlideEl = document.getElementById("current-slide");
     const totalSlidesEl = document.getElementById("total-slides");
+
+    // Initialize mermaid
+    mermaid.initialize({ startOnLoad: false, theme: 'default' });
 
     // Fetch JSON data
     fetch("data.json")
@@ -29,11 +33,28 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const slide = slides[index];
         
-        // Reset image display
+        // Reset display
         imgEl.style.display = "block";
+        renderEl.style.display = "none";
+        renderEl.innerHTML = "";
         fallbackEl.style.display = "none";
         
-        // Update content
+        // Handle image load error: fallback to mermaid render
+        imgEl.onerror = async function() {
+            this.style.display = 'none';
+            renderEl.style.display = 'flex';
+            
+            try {
+                const { svg } = await mermaid.render('mermaid-svg-' + index, slide.mermaid_code);
+                renderEl.innerHTML = svg;
+            } catch (error) {
+                console.error("Mermaid render failed:", error);
+                renderEl.style.display = 'none';
+                fallbackEl.style.display = "block";
+            }
+        };
+
+        // Trigger load
         imgEl.src = slide.image_filename;
         codeEl.textContent = slide.mermaid_code;
         titleEl.textContent = slide.title;
