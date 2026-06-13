@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Architecture Gallery</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Include marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <div class="gallery-container">
+        <!-- Left Column: Image/Mermaid (60%) -->
+        <div class="media-column">
+            <div class="media-wrapper">
+                <img id="gallery-image" src="" alt="Gallery Image" onerror="this.style.display='none'; document.getElementById('mermaid-fallback').style.display='block';">
+                <div id="mermaid-fallback" class="fallback-code">
+                    <p class="fallback-note"><em>Waiting for PNG upload... Meanwhile, here is the raw Mermaid code:</em></p>
+                    <pre><code id="mermaid-code"></code></pre>
+                </div>
+            </div>
+            
+            <div class="nav-controls left">
+                <button id="prev-btn" aria-label="Previous Slide">❮</button>
+            </div>
+            <div class="nav-controls right">
+                <button id="next-btn" aria-label="Next Slide">❯</button>
+            </div>
+            <div class="slide-counter">
+                <span id="current-slide">1</span> / <span id="total-slides">6</span>
+            </div>
+        </div>
+
+        <!-- Right Column: Text & Discussion (40%) -->
+        <div class="text-column">
+            <header class="text-header">
+                <h1 id="gallery-title">Loading...</h1>
+            </header>
+            <div class="text-content">
+                <div id="gallery-description">
+                    <!-- Markdown content injected here -->
+                </div>
+            </div>
+            <footer class="text-footer">
+                <p>Use keyboard arrow keys ⬅️ ➡️ to navigate</p>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>
