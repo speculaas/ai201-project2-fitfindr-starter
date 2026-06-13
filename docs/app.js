@@ -47,6 +47,21 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 const { svg } = await mermaid.render('mermaid-svg-' + index, slide.mermaid_code);
                 renderEl.innerHTML = svg;
+                
+                // Enable SVG Pan and Zoom
+                const svgElement = renderEl.querySelector('svg');
+                if (svgElement) {
+                    svgElement.style.width = '100%';
+                    svgElement.style.height = '100%';
+                    svgPanZoom(svgElement, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: true,
+                        center: true,
+                        minZoom: 0.5,
+                        maxZoom: 10
+                    });
+                }
             } catch (error) {
                 console.error("Mermaid render failed:", error);
                 renderEl.style.display = 'none';
