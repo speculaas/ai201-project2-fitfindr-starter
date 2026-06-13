@@ -61,16 +61,35 @@ If the `outfit` string is missing or entirely whitespace, the tool detects this 
 
 ---
 
+### Optional Stretch Tool: retry_search_with_fallback
+
+**What it does:**
+If the first search returns no results, this tool retries the search with loosened constraints (e.g. removing size/price filters, and generalizing the description).
+
+**Input parameters:**
+- `original_description` (str): the original search phrase
+- `size` (str | None): the original size filter
+- `max_price` (float | None): the original price ceiling
+
+**What it returns:**
+A list of dicts containing the fallback results.
+
+**What happens if it fails or returns nothing:**
+If the fallback search also fails, it returns an empty list, and the agent must tell the user that even with looser constraints, no items were found.
+
+---
+
 ## Planning Loop
 
 **How does your agent decide which tool to call next?**
 1. The agent starts by parsing the natural language query into a structured set of arguments (description, size, max_price).
 2. It calls `search_listings` with the parsed parameters.
-3. If `search_listings` returns an empty list, the agent immediately sets `session["error"] = "No matching items found"` and returns, stopping the loop.
-4. If results exist, it takes the top result (index 0) and sets it to `session["selected_item"]`.
-5. It then sequentially calls `suggest_outfit`, feeding the `selected_item` and the `wardrobe` dict.
-6. Once `suggest_outfit` returns a string, it stores it in `session["outfit_suggestion"]`.
-7. Finally, it passes the suggestion and `selected_item` to `create_fit_card` and stores the resulting caption in `session["fit_card"]`, completing the run.
+3. If `search_listings` returns an empty list, it calls `retry_search_with_fallback` to try a looser search.
+4. If `retry_search_with_fallback` also returns an empty list, the agent sets `session["error"] = "No matching items found"` and returns.
+5. If results exist (from either search), it takes the top result (index 0) and sets it to `session["selected_item"]`. If fallback was used, it sets `session["fallback_message"]`.
+6. It then sequentially calls `suggest_outfit`, feeding the `selected_item` and the `wardrobe` dict.
+7. Once `suggest_outfit` returns a string, it stores it in `session["outfit_suggestion"]`.
+8. Finally, it passes the suggestion and `selected_item` to `create_fit_card` and stores the resulting caption in `session["fit_card"]`, completing the run.
 
 ---
 
@@ -158,3 +177,8 @@ The agent calls `create_fit_card(outfit_suggestion, selected_item)` using the st
 
 **Final output to user:**
 The Gradio UI displays the selected listing details, the outfit styling advice, and the shareable fit card.
+
+---
+
+## README Citation
+This project connects to LLM-agent ideas from Amatriain’s prompt engineering survey. In particular, FitFindr uses a simple chain/agent structure: the output of `search_listings` becomes state for `suggest_outfit`, and that output becomes input for `create_fit_card`. The project also reflects the paper’s point that LLMs do not maintain reliable state on their own, so the application must manage session state explicitly.

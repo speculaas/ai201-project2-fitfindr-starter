@@ -73,8 +73,17 @@ def search_listings(
     
     results = []
     
-    # Pre-process keywords
+    # Pre-process keywords and apply lightweight synonyms
     keywords = set(description.lower().split())
+    synonyms = {
+        "jorts": ["denim", "shorts", "jean", "cutoff", "cut-off"],
+        "pink": ["pink", "y2k", "summer", "denim"],
+        "a-line": ["shorts", "wide", "relaxed", "loose"]
+    }
+    expanded_keywords = set(keywords)
+    for kw in keywords:
+        if kw in synonyms:
+            expanded_keywords.update(synonyms[kw])
 
     for item in listings:
         # Filter by price
@@ -87,7 +96,7 @@ def search_listings(
             
         # Score by keyword overlap (title + description + category + style_tags)
         item_text = f"{item.get('title', '')} {item.get('description', '')} {item.get('category', '')} {' '.join(item.get('style_tags', []))}".lower()
-        score = sum(1 for kw in keywords if kw in item_text)
+        score = sum(1 for kw in expanded_keywords if kw in item_text)
         
         if score > 0:
             # Store score temporarily
@@ -103,6 +112,24 @@ def search_listings(
         del r["_score"]
         
     return results
+
+# ── Tool 1.5: retry_search_with_fallback ──────────────────────────────────────
+
+def retry_search_with_fallback(original_description: str, size: str | None, max_price: float | None) -> list[dict]:
+    """
+    If the first search returns no results, this tool retries the search
+    with loosened constraints. It drops the size filter and increases max_price,
+    while using broader terms for the description.
+    """
+    # Loosen constraints: remove size, increase max price slightly, and keep description simple
+    new_max = (max_price * 1.5) if max_price is not None else None
+    
+    # Try a broader search using just "denim shorts" if the original had "jorts" or "pink"
+    broader_desc = original_description
+    if "jorts" in broader_desc.lower() or "pink" in broader_desc.lower() or "a-line" in broader_desc.lower():
+        broader_desc = "denim shorts"
+        
+    return search_listings(broader_desc, size=None, max_price=new_max)
 
 
 # ── Tool 2: suggest_outfit ────────────────────────────────────────────────────

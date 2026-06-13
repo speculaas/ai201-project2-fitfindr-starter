@@ -18,7 +18,7 @@ Usage (once implemented):
     print(result["error"])   # None on success
 """
 
-from tools import search_listings, suggest_outfit, create_fit_card
+from tools import search_listings, suggest_outfit, create_fit_card, retry_search_with_fallback
 
 
 # ── session state ─────────────────────────────────────────────────────────────
@@ -110,11 +110,18 @@ def run_agent(query: str, wardrobe: dict) -> dict:
 
     # Step 3: Call search_listings
     results = search_listings(query, size, max_price)
-    session["search_results"] = results
     
     if not results:
-        session["error"] = "No matching items found. Please try different keywords or loosen constraints."
-        return session
+        # Try fallback search
+        fallback_results = retry_search_with_fallback(query, size, max_price)
+        if fallback_results:
+            results = fallback_results
+            session["fallback_message"] = "I couldn't find an exact match in that size and price, so I loosened the search to similar items."
+        else:
+            session["error"] = "No matching items found. Please try different keywords or loosen constraints."
+            return session
+            
+    session["search_results"] = results
         
     # Step 4: Select top item
     selected_item = results[0]

@@ -54,8 +54,11 @@ def handle_query(user_query: str, wardrobe_choice: str) -> tuple[str, str, str]:
         return f"Error: {session['error']}", "", ""
         
     item = session.get("selected_item", {})
+    fallback_msg = session.get("fallback_message", "")
+    prefix = f"[INFO] {fallback_msg}\n\n" if fallback_msg else ""
+    
     listing_text = (
-        f"Title: {item.get('title', 'Unknown')}\n"
+        f"{prefix}Title: {item.get('title', 'Unknown')}\n"
         f"Price: ${item.get('price', 0.0)}\n"
         f"Size: {item.get('size', 'N/A')}\n"
         f"Description: {item.get('description', '')}\n"
