@@ -1,3 +1,6 @@
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs';
+
 document.addEventListener("DOMContentLoaded", () => {
     let slides = [];
     let currentIndex = 0;
@@ -11,7 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentSlideEl = document.getElementById("current-slide");
     const totalSlidesEl = document.getElementById("total-slides");
 
-    // Initialize mermaid
+    // Initialize mermaid with ELK support
+    mermaid.registerLayoutLoaders(elkLayouts);
     mermaid.initialize({ startOnLoad: false, theme: 'default' });
 
     // Fetch JSON data
