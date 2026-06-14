@@ -175,24 +175,27 @@ function renderCommentsArray(comments, container, isFocusedParent) {
                 imgEl.style.display = "block";
                 imgEl.src = comment.image_url;
                 
-                if (comment.nested_json_file && !isFocusedParent) {
-                    try {
-                        const resp = await fetch(comment.nested_json_file);
-                        const nestedSlide = await resp.json();
-                        
-                        // Push current view to stack
-                        navigationStack.push(currentState);
-                        
-                        // Render the nested view
-                        renderRightColumn({
-                            type: 'nested',
-                            parentComment: comment,
-                            comments: nestedSlide.comments || []
-                        });
-                        
-                    } catch(err) {
-                        console.error("Failed to load nested thread", err);
+                if (!isFocusedParent) {
+                    let nestedComments = [];
+                    if (comment.nested_json_file) {
+                        try {
+                            const resp = await fetch(comment.nested_json_file);
+                            const nestedSlide = await resp.json();
+                            nestedComments = nestedSlide.comments || [];
+                        } catch(err) {
+                            console.error("Failed to load nested thread", err);
+                        }
                     }
+                    
+                    // Push current view to stack
+                    navigationStack.push(currentState);
+                    
+                    // Render the nested view (even if nestedComments is empty)
+                    renderRightColumn({
+                        type: 'nested',
+                        parentComment: comment,
+                        comments: nestedComments
+                    });
                 }
             };
             
