@@ -106,10 +106,15 @@ function renderSlide(index) {
                 authorDiv.textContent = comment.author;
                 commentDiv.appendChild(authorDiv);
                 
+                const textWrapper = document.createElement("div");
+                textWrapper.className = "comment-text-wrapper";
+                
                 const textDiv = document.createElement("div");
-                textDiv.className = "comment-text";
+                textDiv.className = "comment-text comment-text-content collapsed";
                 textDiv.innerHTML = marked.parse(comment.text);
-                commentDiv.appendChild(textDiv);
+                textWrapper.appendChild(textDiv);
+                
+                commentDiv.appendChild(textWrapper);
                 
                 if (comment.image_url) {
                     const imgContainer = document.createElement("div");
@@ -131,6 +136,23 @@ function renderSlide(index) {
                 }
                 
                 commentsContainer.appendChild(commentDiv);
+            });
+            
+            // Check for overflowing comment text to add "See more" buttons
+            requestAnimationFrame(() => {
+                const textContents = commentsContainer.querySelectorAll('.comment-text-content');
+                textContents.forEach(content => {
+                    if (content.scrollHeight > content.clientHeight) {
+                        const btn = document.createElement("button");
+                        btn.className = "see-more-btn";
+                        btn.textContent = "See more";
+                        btn.onclick = () => {
+                            content.classList.remove('collapsed');
+                            btn.remove();
+                        };
+                        content.parentElement.appendChild(btn);
+                    }
+                });
             });
         }
     }

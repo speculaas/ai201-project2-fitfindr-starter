@@ -219,6 +219,39 @@ body {
     min-width: 0;
 }
 
+.comment-text-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.comment-text-content {
+    transition: max-height 0.3s ease;
+}
+
+.comment-text-content.collapsed {
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.see-more-btn {
+    background: none;
+    border: none;
+    color: #050505;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 0 0 0;
+    text-align: left;
+    font-size: 0.95rem;
+    align-self: flex-start;
+}
+
+.see-more-btn:hover {
+    text-decoration: underline;
+}
+
 .comment-text p {
     margin: 0 0 0.5rem 0;
 }
