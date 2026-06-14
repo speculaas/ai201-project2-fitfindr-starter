@@ -11,6 +11,8 @@ def main():
     parser.add_argument("--image", default="", help="Optional URL or path for a main viewport image.")
     parser.add_argument("--data-file", default="../docs/data.json", help="Path to the gallery data.json to append to.")
     
+    parser.add_argument("--nested-output", default="", help="Optional path to output as a standalone nested JSON file instead of appending to data.json.")
+    
     args = parser.parse_args()
 
     # Paths resolution
@@ -23,10 +25,6 @@ def main():
         print(f"Error: Input file not found at {input_path}")
         sys.exit(1)
         
-    if not os.path.exists(data_path):
-        print(f"Error: data.json not found at {data_path}")
-        sys.exit(1)
-    
     with open(input_path, "r", encoding="utf-8") as f:
         data = json.load(f)
         
@@ -36,7 +34,6 @@ def main():
     def escape_text(text):
         import re
         if not text: return text
-        # Replace < and > with HTML entities, unless they are already escaped with a backslash
         text = re.sub(r'(?<!\\)<', '&lt;', text)
         text = re.sub(r'(?<!\\)>', '&gt;', text)
         return text
@@ -69,14 +66,25 @@ def main():
             })
             
     slide = {
-        "id": os.path.basename(input_path).split('_')[0], # Use first part of filename as ID
+        "id": os.path.basename(input_path).split('_')[0],
         "title": args.title,
         "image_filename": args.image,
         "mermaid_code": args.mermaid,
-        "description": "Conversation extracted via conversion script. Click on any comment images to view them in the main window.",
+        "description": "Nested conversation thread.",
         "comments": comments
     }
     
+    if args.nested_output:
+        nested_out = os.path.abspath(args.nested_output)
+        with open(nested_out, "w", encoding="utf-8") as f:
+            json.dump(slide, f, indent=4)
+        print(f"Successfully generated standalone nested thread at {nested_out}")
+        return
+
+    if not os.path.exists(data_path):
+        print(f"Error: data.json not found at {data_path}")
+        sys.exit(1)
+        
     # Read existing data.json
     with open(data_path, "r", encoding="utf-8") as f:
         gallery_data = json.load(f)

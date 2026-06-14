@@ -1,34 +1,31 @@
 let slides = [];
 let currentIndex = 0;
+let navigationStack = [];
+let currentState = null;
 
 const imgEl = document.getElementById("gallery-image");
 const fallbackEl = document.getElementById("mermaid-fallback");
 const renderEl = document.getElementById("mermaid-render");
 const codeEl = document.getElementById("mermaid-code");
 const titleEl = document.getElementById("gallery-title");
-const descEl = document.getElementById("gallery-description");
 const currentSlideEl = document.getElementById("current-slide");
 const totalSlidesEl = document.getElementById("total-slides");
 
-// Use an async IIFE to catch import errors gracefully
+const textContentEl = document.querySelector(".text-content");
+
 (async function init() {
     try {
         titleEl.textContent = "Loading modules...";
         
-        // Dynamically import Mermaid and ELK to catch any CDN/CORS errors
         const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
         const { default: elkLayouts } = await import('https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs');
 
-        // Initialize mermaid with ELK support
         mermaid.registerLayoutLoaders(elkLayouts);
         mermaid.initialize({ startOnLoad: false, theme: 'default' });
-        
-        // Expose mermaid to global scope so renderSlide's onerror can use it
         window.mermaid = mermaid;
 
         titleEl.textContent = "Fetching data...";
 
-        // Fetch JSON data
         const response = await fetch("data.json");
         const data = await response.json();
         
@@ -39,7 +36,7 @@ const totalSlidesEl = document.getElementById("total-slides");
     } catch (err) {
         console.error("Initialization failed:", err);
         titleEl.textContent = "Error Starting App";
-        descEl.innerHTML = `<p>There was a problem loading the scripts or data:</p><pre style="color:red;">${err.stack || err.message || err}</pre><p>Check your browser console (F12) for more details.</p>`;
+        textContentEl.innerHTML = `<p>Error loading scripts or data:</p><pre style="color:red;">${err.message}</pre>`;
     }
 })();
 
@@ -47,14 +44,13 @@ function renderSlide(index) {
     if (slides.length === 0) return;
     
     const slide = slides[index];
+    navigationStack = []; // Reset focus depth
     
-    // Reset display
     imgEl.style.display = "block";
     renderEl.style.display = "none";
     renderEl.innerHTML = "";
     fallbackEl.style.display = "none";
     
-    // Handle image load error: fallback to mermaid render
     imgEl.onerror = async function() {
         this.style.display = 'none';
         renderEl.style.display = 'flex';
@@ -63,102 +59,149 @@ function renderSlide(index) {
             const { svg } = await window.mermaid.render('mermaid-svg-' + index, slide.mermaid_code);
             renderEl.innerHTML = svg;
             
-            // Enable SVG Pan and Zoom
             const svgElement = renderEl.querySelector('svg');
             if (svgElement) {
                 svgElement.style.width = '100%';
                 svgElement.style.height = '100%';
-                svgPanZoom(svgElement, {
-                    zoomEnabled: true,
-                    controlIconsEnabled: true,
-                    fit: true,
-                    center: true,
-                    minZoom: 0.5,
-                    maxZoom: 10
-                });
+                svgPanZoom(svgElement, { zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true, minZoom: 0.5, maxZoom: 10 });
             }
         } catch (error) {
-            console.error("Mermaid render failed:", error);
             renderEl.style.display = 'none';
             fallbackEl.style.display = "block";
         }
     };
     
-    // Trigger load
     imgEl.src = slide.image_filename;
     codeEl.textContent = slide.mermaid_code;
     titleEl.textContent = slide.title;
     
-    // Parse markdown description
-    descEl.innerHTML = slide.description ? marked.parse(slide.description) : "";
+    renderRightColumn({
+        type: 'root',
+        description: slide.description,
+        comments: slide.comments || []
+    });
     
-    // Render comments if they exist
-    const commentsContainer = document.getElementById("gallery-comments-container");
-    if (commentsContainer) {
-        commentsContainer.innerHTML = "";
-        if (slide.comments && slide.comments.length > 0) {
-            slide.comments.forEach(comment => {
-                const commentDiv = document.createElement("div");
-                commentDiv.className = "comment";
-                
-                const authorDiv = document.createElement("div");
-                authorDiv.className = "comment-author";
-                authorDiv.textContent = comment.author;
-                commentDiv.appendChild(authorDiv);
-                
-                const textWrapper = document.createElement("div");
-                textWrapper.className = "comment-text-wrapper";
-                
-                const textDiv = document.createElement("div");
-                textDiv.className = "comment-text comment-text-content collapsed";
-                textDiv.innerHTML = marked.parse(comment.text);
-                textWrapper.appendChild(textDiv);
-                
-                commentDiv.appendChild(textWrapper);
-                
-                if (comment.image_url) {
-                    const imgContainer = document.createElement("div");
-                    imgContainer.className = "comment-image-container";
-                    const commentImg = document.createElement("img");
-                    commentImg.src = comment.image_url;
-                    commentImg.alt = "Comment attachment";
-                    
-                    // Click to move to main viewport
-                    commentImg.onclick = () => {
-                        renderEl.style.display = "none";
-                        fallbackEl.style.display = "none";
-                        imgEl.style.display = "block";
-                        imgEl.src = comment.image_url;
-                    };
-                    
-                    imgContainer.appendChild(commentImg);
-                    commentDiv.appendChild(imgContainer);
-                }
-                
-                commentsContainer.appendChild(commentDiv);
-            });
-            
-            // Check for overflowing comment text to add "See more" buttons
-            requestAnimationFrame(() => {
-                const textContents = commentsContainer.querySelectorAll('.comment-text-content');
-                textContents.forEach(content => {
-                    if (content.scrollHeight > content.clientHeight) {
-                        const btn = document.createElement("button");
-                        btn.className = "see-more-btn";
-                        btn.textContent = "See more";
-                        btn.onclick = () => {
-                            content.classList.remove('collapsed');
-                            btn.remove();
-                        };
-                        content.parentElement.appendChild(btn);
-                    }
-                });
-            });
+    currentSlideEl.textContent = index + 1;
+}
+
+function renderRightColumn(state) {
+    currentState = state;
+    textContentEl.innerHTML = "";
+    
+    if (state.type === 'nested') {
+        const backContainer = document.createElement("div");
+        backContainer.className = "back-btn-container";
+        const backBtn = document.createElement("button");
+        backBtn.className = "back-btn";
+        backBtn.textContent = "⬅ Back to previous thread";
+        backBtn.onclick = () => {
+            const prevState = navigationStack.pop();
+            renderRightColumn(prevState);
+        };
+        backContainer.appendChild(backBtn);
+        textContentEl.appendChild(backContainer);
+        
+        const parentContainer = document.createElement("div");
+        parentContainer.className = "parent-focused-comment comment-thread";
+        renderCommentsArray([state.parentComment], parentContainer, true);
+        textContentEl.appendChild(parentContainer);
+    } else {
+        if (state.description) {
+            const descEl = document.createElement("div");
+            descEl.id = "gallery-description";
+            descEl.innerHTML = marked.parse(state.description);
+            textContentEl.appendChild(descEl);
         }
     }
     
-    // Update counter
-    currentSlideEl.textContent = index + 1;
+    const commentsContainer = document.createElement("div");
+    commentsContainer.id = "gallery-comments-container";
+    commentsContainer.className = "comment-thread";
+    
+    if (state.comments && state.comments.length > 0) {
+        renderCommentsArray(state.comments, commentsContainer, false);
+    }
+    
+    textContentEl.appendChild(commentsContainer);
+    
+    requestAnimationFrame(() => {
+        const textContents = textContentEl.querySelectorAll('.comment-text-content');
+        textContents.forEach(content => {
+            if (content.scrollHeight > content.clientHeight) {
+                const btn = document.createElement("button");
+                btn.className = "see-more-btn";
+                btn.textContent = "See more";
+                btn.onclick = () => {
+                    content.classList.remove('collapsed');
+                    btn.remove();
+                };
+                content.parentElement.appendChild(btn);
+            }
+        });
+    });
+}
+
+function renderCommentsArray(comments, container, isFocusedParent) {
+    comments.forEach(comment => {
+        const commentDiv = document.createElement("div");
+        commentDiv.className = "comment";
+        
+        const authorDiv = document.createElement("div");
+        authorDiv.className = "comment-author";
+        authorDiv.textContent = comment.author;
+        commentDiv.appendChild(authorDiv);
+        
+        const textWrapper = document.createElement("div");
+        textWrapper.className = "comment-text-wrapper";
+        
+        const collapsedClass = isFocusedParent ? "" : "collapsed";
+        const textDiv = document.createElement("div");
+        textDiv.className = `comment-text comment-text-content ${collapsedClass}`;
+        textDiv.innerHTML = marked.parse(comment.text);
+        textWrapper.appendChild(textDiv);
+        
+        commentDiv.appendChild(textWrapper);
+        
+        if (comment.image_url) {
+            const imgContainer = document.createElement("div");
+            imgContainer.className = "comment-image-container";
+            const commentImg = document.createElement("img");
+            commentImg.src = comment.image_url;
+            commentImg.alt = "Comment attachment";
+            
+            commentImg.onclick = async () => {
+                renderEl.style.display = "none";
+                fallbackEl.style.display = "none";
+                imgEl.style.display = "block";
+                imgEl.src = comment.image_url;
+                
+                if (comment.nested_json_file && !isFocusedParent) {
+                    try {
+                        const resp = await fetch(comment.nested_json_file);
+                        const nestedSlide = await resp.json();
+                        
+                        // Push current view to stack
+                        navigationStack.push(currentState);
+                        
+                        // Render the nested view
+                        renderRightColumn({
+                            type: 'nested',
+                            parentComment: comment,
+                            comments: nestedSlide.comments || []
+                        });
+                        
+                    } catch(err) {
+                        console.error("Failed to load nested thread", err);
+                    }
+                }
+            };
+            
+            imgContainer.appendChild(commentImg);
+            commentDiv.appendChild(imgContainer);
+        }
+        
+        container.appendChild(commentDiv);
+    });
 }
 
 function nextSlide() {
@@ -173,15 +216,10 @@ function prevSlide() {
     renderSlide(currentIndex);
 }
 
-// Event Listeners
 document.getElementById("next-btn").addEventListener("click", nextSlide);
 document.getElementById("prev-btn").addEventListener("click", prevSlide);
 
-// Keyboard navigation
 document.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowRight") {
-        nextSlide();
-    } else if (e.key === "ArrowLeft") {
-        prevSlide();
-    }
+    if (e.key === "ArrowRight") nextSlide();
+    else if (e.key === "ArrowLeft") prevSlide();
 });
