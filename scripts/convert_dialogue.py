@@ -33,10 +33,18 @@ def main():
     turns = data.get("turns", [])
     comments = []
     
+    def escape_text(text):
+        import re
+        if not text: return text
+        # Replace < and > with HTML entities, unless they are already escaped with a backslash
+        text = re.sub(r'(?<!\\)<', '&lt;', text)
+        text = re.sub(r'(?<!\\)>', '&gt;', text)
+        return text
+    
     for turn in turns:
-        question = turn.get("question", "").strip()
-        reasoning = turn.get("reasoning", "").strip()
-        answer = turn.get("answer", "").strip()
+        question = escape_text(turn.get("question", "").strip())
+        reasoning = escape_text(turn.get("reasoning", "").strip())
+        answer = escape_text(turn.get("answer", "").strip())
         
         if question:
             comments.append({
