@@ -90,7 +90,50 @@ function renderSlide(index) {
     titleEl.textContent = slide.title;
     
     // Parse markdown description
-    descEl.innerHTML = marked.parse(slide.description);
+    descEl.innerHTML = slide.description ? marked.parse(slide.description) : "";
+    
+    // Render comments if they exist
+    const commentsContainer = document.getElementById("gallery-comments-container");
+    if (commentsContainer) {
+        commentsContainer.innerHTML = "";
+        if (slide.comments && slide.comments.length > 0) {
+            slide.comments.forEach(comment => {
+                const commentDiv = document.createElement("div");
+                commentDiv.className = "comment";
+                
+                const authorDiv = document.createElement("div");
+                authorDiv.className = "comment-author";
+                authorDiv.textContent = comment.author;
+                commentDiv.appendChild(authorDiv);
+                
+                const textDiv = document.createElement("div");
+                textDiv.className = "comment-text";
+                textDiv.innerHTML = marked.parse(comment.text);
+                commentDiv.appendChild(textDiv);
+                
+                if (comment.image_url) {
+                    const imgContainer = document.createElement("div");
+                    imgContainer.className = "comment-image-container";
+                    const commentImg = document.createElement("img");
+                    commentImg.src = comment.image_url;
+                    commentImg.alt = "Comment attachment";
+                    
+                    // Click to move to main viewport
+                    commentImg.onclick = () => {
+                        renderEl.style.display = "none";
+                        fallbackEl.style.display = "none";
+                        imgEl.style.display = "block";
+                        imgEl.src = comment.image_url;
+                    };
+                    
+                    imgContainer.appendChild(commentImg);
+                    commentDiv.appendChild(imgContainer);
+                }
+                
+                commentsContainer.appendChild(commentDiv);
+            });
+        }
+    }
     
     // Update counter
     currentSlideEl.textContent = index + 1;
