@@ -1,0 +1,64 @@
+{
+    "id": "dlg-m365-17384b89",
+    "title": "amazon sphere",
+    "image_filename": "",
+    "mermaid_code": "",
+    "description": "Nested conversation thread.",
+    "comments": [
+        {
+            "author": "User",
+            "text": "can you check for me if amazon sphere is open on august 1st Saturday? and do I need to make a reservation?",
+            "image_url": ""
+        },
+        {
+            "author": "Agent Reasoning",
+            "text": "```text\nReasoning completed in 4 steps\nDetermining date relevance\nI am confirming that August 1, 2026, falls on a Saturday and consider searching for information on the Amazon Spheres in Seattle.\nSearches\nOK, I'll search for 'Amazon Spheres Seattle public visits reservations hours August 1 2026 Saturday'...\nSearches\nOK, I'll search for 'Amazon Spheres Seattle visit reservations official'...\nPlanning reservation details\nI'm calculating that August 1, 2026, is the first Saturday and noting that reservations might open on July 17, 2026, at 10 AM Pacific time.\n```",
+            "image_url": ""
+        },
+        {
+            "author": "Agent Answer",
+            "text": "Yes \u2014 **Amazon\u2019s Seattle Spheres should be open to the public on Saturday, August 1, 2026**, because public visits are offered on the **first and third Saturday of each month**, from **10:00 AM\u20136:00 PM Pacific Time**; August 1, 2026 is the **first Saturday**. [\\[seattlespheres.com\\]](https:www.seattlespheres.com/the-spheres-weekend-public-visits)\nAnd yes, **you need a reservation**. Public visits are **free**, but entry requires a confirmed reservation; reservations become available **15 days before the visit date**. [\\[seattlespheres.com\\]](https:www.seattlespheres.com/the-spheres-weekend-public-visits), [\\[aboutamazon.com\\]](https:www.aboutamazon.com/news/workplace/how-to-visit-the-amazon-spheres-in-seattle)\nFor **August 1, 2026**, reservations should open around **Friday, July 17, 2026**. Amazon says reservations are posted in real time 15 days in advance, and spots can fill quickly. [\\[aboutamazon.com\\]](https:www.aboutamazon.com/news/workplace/how-to-visit-the-amazon-spheres-in-seattle)\n**Booking page:** Go to the official Spheres public visits page and use **\u201cBook a Visit\u201d**:  \n&lt;https:www.seattlespheres.com/the-spheres-weekend-public-visits&gt; [\\[seattlespheres.com\\]](https:www.seattlespheres.com/the-spheres-weekend-public-visits)\nA few quick notes:\n* Address: **2111 7th Avenue, Seattle, WA 98121**. [\\[seattlespheres.com\\]](https:www.seattlespheres.com/the-spheres-weekend-public-visits)\n* Adults **18+ need a valid government ID** at check-in. [\\[seattlespheres.com\\]](https:www.seattlespheres.com/the-spheres-weekend-public-visits)\n* Visits are typically limited to about **one hour**. [\\[seattlespheres.com\\]](https:www.seattlespheres.com/the-spheres-weekend-public-visits)\n* Large bags over **12\u201d x 12\u201d** are not allowed. [\\[seattlespheres.com\\]](https:www.seattlespheres.com/the-spheres-weekend-public-visits)",
+            "image_url": ""
+        },
+        {
+            "author": "User",
+            "text": "does a airline carry on bag qualify for \"Large bags over 12\u201d x 12\u201d are not allowed\"?",
+            "image_url": ""
+        },
+        {
+            "author": "Agent Reasoning",
+            "text": "```text\nReasoning completed in 1 step\nClarifying carry-on rules\nI am determining carry-on bag dimensions, noting that standard sizes typically exceed the limit of 12\"x12.\" I will suggest alternatives like leaving bags at a hotel or locker.\n```",
+            "image_url": ""
+        },
+        {
+            "author": "Agent Answer",
+            "text": "Yes \u2014 a typical **airline carry-on bag would almost certainly be considered too large** for Amazon Spheres\u2019 bag policy.\nThe Spheres\u2019 visitor guidelines say to **limit your bag size to 12\u201d \u00d7 12\u201d or less**.  Most airline carry-ons are larger than that \u2014 for example, a common carry-on size is around **22\u201d \u00d7 14\u201d \u00d7 9\u201d**, so it would exceed the Spheres\u2019 allowed bag size. [\\[seattlespheres.com\\]](https:www.seattlespheres.com/the-spheres-weekend-public-visits)\n**Best plan:** don\u2019t bring a carry-on suitcase to your reservation. Bring only a small purse/crossbody/day bag that fits within **12\u201d \u00d7 12\u201d**, and store your luggage at your hotel, car, or a luggage-storage service before visiting. Adults in your group should also bring a valid government ID for check-in. [\\[seattlespheres.com\\]](https:www.seattlespheres.com/the-spheres-weekend-public-visits)",
+            "image_url": ""
+        },
+        {
+            "author": "User",
+            "text": "I mean a backpack that fits under the front seat",
+            "image_url": ""
+        },
+        {
+            "author": "Agent Answer",
+            "text": "A **backpack that fits under an airplane seat may still be too large** for Amazon Spheres, depending on its dimensions.\nTheir rule is **bag size must be 12\u201d \u00d7 12\u201d or less**.  Many \u201cpersonal item\u201d backpacks that fit under a plane seat are often closer to **16\u201318 inches tall**, so they may exceed the Spheres limit even if they\u2019re airline-approved. [\\[seattlespheres.com\\]](https:www.seattlespheres.com/the-spheres-weekend-public-visits)\n**How to decide:**\n* If your backpack is **12\u201d \u00d7 12\u201d or smaller** when packed: likely okay.\n* If it\u2019s taller than **12 inches** in any main dimension: I\u2019d assume it may **not** be allowed.\n* A small purse, sling bag, mini backpack, or compact daypack is safer.\nIf you\u2019re traveling with luggage, I\u2019d plan to leave the backpack/carry-on at your hotel, car, or luggage storage before the visit\u2014just to avoid being turned away at check-in.",
+            "image_url": ""
+        },
+        {
+            "author": "User",
+            "text": "can you search and summarized if interviewee get complimentary access to the amazon sphere?",
+            "image_url": ""
+        },
+        {
+            "author": "Agent Reasoning",
+            "text": "```text\nReasoning completed in 11 steps\nSearching for official policy\nI am looking to find the latest official policy relevant to the question, which requires some research.\nSearches\nOK, I'll search for 'Amazon Spheres interview candidate complimentary access Seattle interviewee Spheres'...\nSearches\nOK, I'll search for 'Amazon interview candidate visit Spheres access'...\nSearches\nOK, I'll search for 'Amazon Spheres public visits employees guests interview candidates'...\nSeeking official sources\nLooking for open official pages that could provide relevant information.\nSearches\nGathering additional info...\nInvestigating interview access\nLooking into whether interviewees receive complimentary access and the conditions around public access. I'll search for more reliable information and avoid unsupported sources.\nSearches\nOK, I'll search for 'site:amazon.jobs Spheres interview candidate Amazon Seattle'...\nSearches\nOK, I'll search for 'site:aboutamazon.com Spheres interview candidates Amazon'...\nSearches\nOK, I'll search for '\"interview\" \"The Spheres\" \"Amazon\" \"candidate\" Seattle'...\nGathering citation requirements\nI need to ensure all statements have citations, including mentions of policies and access categories. I\u2019ll reference official pages to support claims and aim for a concise final presentation with bullet points.\n```",
+            "image_url": ""
+        },
+        {
+            "author": "Agent Answer",
+            "text": "I searched for official Amazon/Spheres info and didn\u2019t find any official statement saying **Amazon interviewees/candidates automatically get complimentary access to the Amazon Spheres**. The official Spheres page only describes two clear access paths: **public visits by reservation on the first/third Saturday** and **badged Amazon employees on weekdays**, with employee guest registration handled internally. [\\[seattlespheres.com\\]](https:www.seattlespheres.com/the-spheres-weekend-public-visits)\nThe public visit is **free**, but it still requires a confirmed reservation; reservations open **15 days before** the visit date. [\\[seattlespheres.com\\]](https:www.seattlespheres.com/the-spheres-weekend-public-visits), [\\[aboutamazon.com\\]](https:www.aboutamazon.com/news/workplace/how-to-visit-the-amazon-spheres-in-seattle)\nAmazon\u2019s interview/candidate pages explain the interview process and say your **recruiter/scheduler** handles interview logistics, but I did not see anything there about Spheres access being included for candidates. [\\[amazon.jobs\\]](https:www.amazon.jobs/content/en/how-we-hire/), [\\[aboutamazon.com\\]](https:www.aboutamazon.com/news/workplace/amazon-interview-process-phone-screens-loops)\n**Bottom line:** Don\u2019t assume interviewee status gives you Spheres access. If your interview is onsite in Seattle, the safest move is to ask your Amazon recruiter or scheduler something like:\n&gt; \u201cSince I\u2019ll be onsite for my interview, is there any opportunity to visit the Spheres, or should I book a public reservation separately?\u201d\nIf they don\u2019t explicitly arrange it, plan to book the normal free public reservation.",
+            "image_url": ""
+        }
+    ]
+}
