@@ -21,7 +21,7 @@ const totalSlidesEl = document.getElementById("total-slides");
 
         // Initialize mermaid with ELK support
         mermaid.registerLayoutLoaders(elkLayouts);
-        mermaid.initialize({ startOnLoad: false, theme: 'default' });
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
         
         // Expose mermaid to global scope so renderSlide's onerror can use it
         window.mermaid = mermaid;
