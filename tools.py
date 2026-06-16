@@ -166,7 +166,7 @@ def suggest_outfit(new_item: dict, wardrobe: dict) -> str:
             "Can you give me some general, versatile styling ideas for this piece? What kinds of items and vibes pair well with it?"
         )
     else:
-        wardrobe_list = "\n".join([f"- {w.get('color', '')} {w.get('category', '')} ({w.get('style', '')})" for w in wardrobe["items"]])
+        wardrobe_list = "\n".join([f"- {w.get('name', 'Item')} ({w.get('category', '')})" for w in wardrobe["items"]])
         prompt = (
             f"I just bought a '{new_item.get('title')}' ({new_item.get('description')}). "
             f"Here is my current wardrobe:\n{wardrobe_list}\n"
