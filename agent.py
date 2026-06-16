@@ -93,6 +93,7 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     of planning.md — your implementation should match what you described there.
     """
     session = _new_session(query, wardrobe)
+    print(f"\n[DEBUG] Starting run_agent with query: '{query}'")
     
     import re
     # Simple regex parsing for size and max_price
@@ -107,17 +108,22 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         "size": size,
         "max_price": max_price
     }
+    print(f"[DEBUG] Parsed parameters: size={size}, max_price={max_price}")
 
     # Step 3: Call search_listings
     results = search_listings(query, size, max_price)
+    print(f"[DEBUG] search_listings returned {len(results)} results")
     
     if not results:
         # Try fallback search
+        print("[DEBUG] Initial search failed. Trying fallback search...")
         fallback_results = retry_search_with_fallback(query, size, max_price)
         if fallback_results:
             results = fallback_results
+            print(f"[DEBUG] Fallback search succeeded with {len(results)} results")
             session["fallback_message"] = "I couldn't find an exact match in that size and price, so I loosened the search to similar items."
         else:
+            print("[DEBUG] Fallback search also failed. Exiting.")
             session["error"] = "No matching items found. Please try different keywords or loosen constraints."
             return session
             
@@ -126,14 +132,19 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     # Step 4: Select top item
     selected_item = results[0]
     session["selected_item"] = selected_item
+    print(f"[DEBUG] Selected item: '{selected_item.get('title')}'")
     
     # Step 5: Call suggest_outfit
+    print("[DEBUG] Calling suggest_outfit...")
     outfit = suggest_outfit(selected_item, session["wardrobe"])
     session["outfit_suggestion"] = outfit
     
     # Step 6: Call create_fit_card
+    print("[DEBUG] Calling create_fit_card...")
     fit_card = create_fit_card(outfit, selected_item)
     session["fit_card"] = fit_card
+    
+    print("[DEBUG] Interaction complete. Returning session.")
     
     # Step 7: Return session
     return session
