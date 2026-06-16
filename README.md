@@ -75,6 +75,40 @@ Your implementation files go in this same directory. There's no required file st
 **Planning Loop & State Management:**
 The agent orchestrates the tools sequentially and stores data in a shared `session` dictionary. It first parses the user query and calls `search_listings`. If results are found, it grabs the top item and stores it as `session["selected_item"]`. The agent then calls `suggest_outfit` passing the selected item and wardrobe, saving the result to `session["outfit_suggestion"]`. Finally, it passes both the suggestion and selected item to `create_fit_card` and stores the caption in `session["fit_card"]`. The agent avoids blindly calling tools by branching on empty results and early-exiting when necessary.
 
+```mermaid
+sequenceDiagram
+    participant App as app.py (Gradio)
+    participant Agent as agent.py (Planning Loop)
+    participant Tools as tools.py (Functions)
+    participant LLM as Groq API
+
+    App->>Agent: run_agent(query, wardrobe)
+    
+    %% Step 1: Search Listings
+    Agent->>Tools: search_listings(description, size, max_price)
+    alt No Results
+        Tools-->>Agent: [] (Empty List)
+        Agent->>Tools: retry_search_with_fallback(...)
+        Tools-->>Agent: [fallback_item]
+    else Success
+        Tools-->>Agent: [item1, item2, ...]
+    end
+    
+    %% Step 2: Suggest Outfit
+    Agent->>Tools: suggest_outfit(selected_item, wardrobe)
+    Tools->>LLM: Prompt (item + wardrobe)
+    LLM-->>Tools: Outfit string
+    Tools-->>Agent: outfit_suggestion
+    
+    %% Step 3: Create Fit Card
+    Agent->>Tools: create_fit_card(outfit_suggestion, selected_item)
+    Tools->>LLM: Prompt (item + outfit)
+    LLM-->>Tools: Caption string
+    Tools-->>Agent: fit_card
+    
+    Agent-->>App: return session dictionary
+```
+
 ### 2. Error Handling Strategy
 
 To ensure the agent remains useful during failure modes, error handling is implemented at the tool level:
