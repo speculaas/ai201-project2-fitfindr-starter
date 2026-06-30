@@ -43,16 +43,58 @@ Per dialogue (= one conversation thread / "slide"):
 6. **Search** what you've built at `http://localhost:5000/search` (grep-style),
    browse by date at `http://localhost:5000/dialogues`.
 
-> Facebook migration: there's no automated FB importer yet. The intended flow is
-> to navigate Facebook manually and rebuild each thread as turns here, setting
-> each turn's date. (A "Download Your Information" importer is a possible future
-> step — its timestamps would auto-fill `occurred_at`.)
+### Facebook content (single text per item)
+citerag turns are Q-A-reasoning, but a Facebook post/comment is just one text
+(+ optional image). citerag still **requires both question and answer** (this
+check is intentional and unchanged), so map each FB item like this:
 
-## 3. Get the data into the gallery format
+- **question** = a short title / the post's first line → becomes the timeline
+  node **title**. This is *not* a throwaway placeholder — it's displayed; if a
+  post has no title, repeat its first line.
+- **answer** = the full Facebook post/comment text → the node **body**.
+- **reasoning** = leave empty.
+- **date** = the real FB date in the **"When it happened"** field (`occurred_at`).
+- **image** = attach via the assets manager (or paste an external URL).
+- **nesting** = set a comment turn's parent to its post turn.
 
-Export the dialogue from citerag (`GET /api/dialogues/<id>/export`, or the
-in-app Export dialog), then convert it to this gallery's schema with the
-existing script (see `USER_MANUAL.md` / `NESTED_THREADS_MANUAL.md`):
+When exporting (step 3a), tick **Plain text (Facebook-style)** so the body shows
+without the `Q:/A:` scaffold.
+
+> There's no automated FB importer yet — rebuild threads manually. (A "Download
+> Your Information" importer is a possible future step; its timestamps would
+> auto-fill `occurred_at`.)
+
+## 3. Export to a viewer
+
+There are two static viewers; pick where to publish.
+
+### 3a. Timeline viewer (`docs/timeline/`) — tree rail + calendar
+citerag exports this viewer's node format directly. From
+`http://localhost:5000/dialogues`:
+
+- **tick** the dialogues you want (the checkbox is a sibling of the row link, so
+  clicking the row still opens it; only the checkbox selects for export),
+- optionally tick **Plain text (Facebook-style)**,
+- click **Export selected → Timeline JSON**, and save it as `docs/timeline/data.json`.
+
+Or via `curl`:
+
+```bash
+# selected ids, Facebook-style body, rewrite asset links + copy the files
+curl 'http://localhost:5000/api/timeline/export?ids=dlg-A,dlg-B&text_style=body&assets=rewrite&asset_base=assets/' -o docs/timeline/data.json
+mkdir -p docs/timeline/assets && cp /path/to/citerag/data/assets/*.{png,jpg,jpeg,webp,gif} docs/timeline/assets/ 2>/dev/null
+
+# or self-contained (inline images as data URIs), all dialogues:
+curl 'http://localhost:5000/api/timeline/export?assets=inline' -o docs/timeline/data.json
+```
+
+Endpoint options: **filter** `ids=a,b,c` | `workspace=active` | `document_id=<id>`
+| none (all); **assets** `keep` (default) | `rewrite` (+`asset_base`) | `inline`;
+**text** `qa` (default) | `body`. See `docs/timeline/README.md`.
+
+### 3b. Original gallery (`docs/index.html`)
+Export a dialogue (`GET /api/dialogues/<id>/export`) and convert it to the gallery
+schema with the existing script (see `USER_MANUAL.md` / `NESTED_THREADS_MANUAL.md`):
 
 ```bash
 # append as a new slide in docs/data.json
@@ -62,11 +104,6 @@ python3 scripts/convert_dialogue.py --input /path/to/exported-dialogue.json --ti
 python3 scripts/convert_dialogue.py --input /path/to/exported-dialogue.json \
   --title "Deep Dive" --nested-output ../docs/nested-deep-dive.json
 ```
-
-> Note: a direct **citerag → gallery exporter** (carrying the tree + dates +
-> images automatically) and the **static tree/calendar viewer** described in the
-> design discussion are not built yet. Until then, `convert_dialogue.py` is the
-> bridge and the current `docs/` gallery is the viewer.
 
 ## 4. Publish to GitHub Pages — your questions answered
 
@@ -115,8 +152,10 @@ Yes — it's pure static and uses **relative** paths (`fetch("data.json")`,
 ---
 
 ## TL;DR
-Author in citerag (a clone, or `CITERAG_DATA_DIR=...`), set each turn's date,
-export → `convert_dialogue.py` → `docs/` (a **subfolder** to preserve the current
-gallery). It's static + relative-path, so it ports to any repo and publishes as
-that repo's Pages site, as long as paths stay relative and images are hosted
-statically.
+Author in citerag, set each turn's date (for Facebook: `question` = title,
+`answer` = body, export with **Plain text**). Then on `/dialogues` tick the
+dialogues and **Export selected → Timeline JSON** into `docs/timeline/data.json`
+(use `assets=rewrite`+copy or `assets=inline` for images). It's static +
+relative-path, so it ports to any repo and publishes as that repo's Pages site,
+as long as paths stay relative and images are hosted statically. The original
+`docs/index.html` gallery (via `convert_dialogue.py`) still works alongside it.
