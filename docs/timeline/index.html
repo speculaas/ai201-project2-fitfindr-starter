@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timeline / Tree Viewer</title>
+  <link rel="stylesheet" href="timeline.css">
+  <!-- Markdown rendering (optional; falls back to plain text if it fails to load) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <header class="tl-header">
+    <button id="tl-tree-toggle" class="tl-icon-btn" title="Collapse / expand tree rail">☰</button>
+    <h1 id="tl-title">Timeline</h1>
+    <div class="tl-views">
+      <button class="tl-view-btn active" data-view="tree">Tree</button>
+      <button class="tl-view-btn" data-view="calendar">Calendar</button>
+    </div>
+    <span id="tl-status" class="tl-status"></span>
+  </header>
+
+  <div id="tl-breadcrumb" class="tl-breadcrumb"></div>
+
+  <main class="tl-main">
+    <!-- LEFT: tree rail (tree view) OR calendar grid (calendar view) -->
+    <aside id="tl-left" class="tl-left" aria-label="Navigation"></aside>
+
+    <!-- CENTER: focused node viewport (shared across views) -->
+    <section id="tl-viewport" class="tl-viewport" aria-label="Focused node"></section>
+
+    <!-- RIGHT: recursive child bubbles (tree view) OR day node list (calendar view) -->
+    <aside id="tl-right" class="tl-right" aria-label="Thread"></aside>
+  </main>
+
+  <footer class="tl-footer">
+    <span>← → siblings · ↑ parent · ↓ first child · click a bubble to drill in</span>
+  </footer>
+
+  <script src="timeline.js"></script>
+</body>
+</html>

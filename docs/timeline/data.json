@@ -1,0 +1,29 @@
+{
+  "nodes": [
+    { "id": "t1", "parent_id": null, "date": "2026-03-04", "author": "me",
+      "title": "Is Amazon Project Kuiper open data?",
+      "image": "https://picsum.photos/seed/kuiper/640/360",
+      "text": "## Thread 1\nStarted exploring satellite-imagery datasets and whether any are openly licensed." },
+    { "id": "t1a", "parent_id": "t1", "date": "2026-03-05", "author": "copilot",
+      "title": "Licensing summary",
+      "text": "Most are research-only; a few permit redistribution with attribution." },
+    { "id": "t1a1", "parent_id": "t1a", "date": "2026-03-06", "author": "me",
+      "title": "Which permit commercial use?",
+      "text": "Follow-up drilling into commercial-use terms." },
+    { "id": "t1b", "parent_id": "t1", "date": "2026-03-09", "author": "me",
+      "title": "Alternative: open mesh datasets",
+      "image": "https://picsum.photos/seed/mesh/640/360",
+      "text": "Branch B off the root — comparing to Thingi10K / ABC." },
+
+    { "id": "t2", "parent_id": null, "date": "2026-04-02", "author": "me",
+      "title": "Slice-100K vs mesh-only datasets",
+      "mermaid": "flowchart TD; A[Geometry] --> B[G-code slices]; A --> C[Mesh]",
+      "text": "## Thread 2 (parallel)\nA second top-level thread — use ← / → to switch between threads." },
+    { "id": "t2a", "parent_id": "t2", "date": "2026-04-03", "author": "copilot",
+      "title": "Extrusion slice channels",
+      "text": "Slice-100K pairs geometry with extrusion G-code channels." },
+    { "id": "t2a1", "parent_id": "t2a", "date": "2026-04-03", "author": "me",
+      "title": "Same-day follow-up",
+      "text": "Two nodes share 2026-04-03 — the calendar cell shows a +N badge." }
+  ]
+}
