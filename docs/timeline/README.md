@@ -68,6 +68,22 @@ curl 'http://localhost:5000/api/timeline/export?document_id=dlg-xxxx&doc_roots=0
 The `download=1` variant (also linked as **Timeline JSON** in citerag's
 `/dialogues` page) saves it as `timeline-data.json` — rename to `data.json` here.
 
+### Images / assets (Pages has no asset server)
+citerag asset links (`/api/assets/<id>/file`, `data/assets/<file>`) won't resolve
+once published. The exporter can fix them:
+
+```bash
+# A) rewrite links to a static base, then copy the files alongside
+curl 'http://localhost:5000/api/timeline/export?assets=rewrite&asset_base=assets/' -o data.json
+mkdir -p assets && cp /path/to/citerag/data/assets/*.{png,jpg,jpeg,webp,gif} assets/ 2>/dev/null
+
+# B) inline images as base64 data URIs — self-contained, no copying (but bigger file)
+curl 'http://localhost:5000/api/timeline/export?assets=inline' -o data.json
+```
+
+`assets=keep` (default) leaves links as-is. External `https://…` image URLs (e.g.
+GitHub user-attachments) are always left untouched and work anywhere.
+
 ## Status
 Scaffold with sample data; the citerag → `data.json` exporter is built (above).
 Still optional: a fancier canvas/lane tree (currently a DOM indented tree).
