@@ -53,8 +53,24 @@ so an exporter is straightforward):
 ```
 A bare array (`[ {...}, ... ]`) is also accepted.
 
+## Populate from citerag
+citerag has a read-only exporter that emits exactly this node format. With citerag
+running, fetch it and replace the sample data:
+
+```bash
+# all dialogues (each becomes a parallel top-level thread)
+curl 'http://localhost:5000/api/timeline/export' -o data.json
+
+# or one dialogue, or without synthetic doc-root nodes:
+curl 'http://localhost:5000/api/timeline/export?document_id=dlg-xxxx&doc_roots=0' -o data.json
+```
+
+The `download=1` variant (also linked as **Timeline JSON** in citerag's
+`/dialogues` page) saves it as `timeline-data.json` — rename to `data.json` here.
+
 ## Status
-Scaffold with sample data. Still to wire: a direct **citerag → `data.json`
-exporter** (carry turns + `occurred_at` + image URLs), and replacing the sample
-`data.json` with exported content. Image URLs must be statically hosted (committed
-or GitHub user-attachments CDN), since Pages has no asset server.
+Scaffold with sample data; the citerag → `data.json` exporter is built (above).
+Still optional: a fancier canvas/lane tree (currently a DOM indented tree).
+**Image URLs must be statically hosted** (committed files or GitHub
+user-attachments CDN), since Pages has no asset server — citerag `/api/assets/...`
+links won't resolve once published.
